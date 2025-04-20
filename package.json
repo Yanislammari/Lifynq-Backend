@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "@types/cors": "^2.8.17",
-    "cors": "^2.8.5"
+    "@types/joi": "^17.2.3",
+    "cors": "^2.8.5",
+    "joi": "^17.13.3"
   }
 }
