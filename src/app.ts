@@ -1,5 +1,6 @@
 import express from "express";
 import { jsonMiddleware } from "./config/middlewares";
+import connectDB from "./config/database";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -15,5 +16,6 @@ app.use(cors({
 }));
 
 jsonMiddleware(app);
+connectDB();
 
 export default app;
