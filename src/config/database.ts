@@ -8,7 +8,7 @@ const connectDB = async () => {
   try {
     await mongoose.connect(MONGODB_DATABASE_PATH);
   }
-  catch(error) {
+  catch (error) {
     process.exit(1);
   }
 };

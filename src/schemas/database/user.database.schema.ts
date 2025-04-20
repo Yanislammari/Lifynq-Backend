@@ -9,7 +9,7 @@ const UserDatabaseSchema = new mongoose.Schema({
     lowercase: true,
     trim: true
   },
-  tel: {
+  phoneNumber: {
     type: String,
     required: true,
     match: /^[\d+\-()\s]+$/

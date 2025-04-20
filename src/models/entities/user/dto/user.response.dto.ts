@@ -3,7 +3,7 @@ import Role from "../../../enums/role";
 interface UserResponseDto {
   id: string;
   email: string;
-  tel: string;
+  phoneNumber: string;
   firstName: string;
   lastName: string;
   age: number;

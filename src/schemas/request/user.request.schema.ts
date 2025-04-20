@@ -4,7 +4,7 @@ import UserRequestDto from "../../models/entities/user/dto/user.request.dto";
 
 const UserRequestSchema = joi.object<UserRequestDto>({
   email: joi.string().email().required(),
-  tel: joi.string().pattern(/^[\d+\-()\s]+$/).required(),
+  phoneNumber: joi.string().pattern(/^[\d+\-()\s]+$/).required(),
   firstName: joi.string().min(2).max(20).required(),
   lastName: joi.string().min(2).max(20).required(),
   age: joi.number().min(0).max(100).required(),
