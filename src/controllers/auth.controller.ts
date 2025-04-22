@@ -18,6 +18,17 @@ class AuthController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async verifyOtp(req: Request, res: Response): Promise<void> {
+    try {
+      const { phoneNumber, code } = req.body;
+      const token = await this.authService.verifyOtp(phoneNumber, code);
+      res.status(200).json({ token: token });
+    }
+    catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 export default AuthController;
