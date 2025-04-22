@@ -26,7 +26,7 @@ abstract class BaseRepository<T> implements IRepository<T> {
     return created.toObject() as T;
   }
 
-  async put(id: string, data: T): Promise<T> {
+  async put(id: string, data: Partial<T>): Promise<T> {
     const updated = await this.model.findByIdAndUpdate(id, data as UpdateQuery<T>, { new: true });
     if (!updated) {
       throw new Error("Not found");

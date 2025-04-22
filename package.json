@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.1",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/nodemon": "^3.1.1",
     "@types/typescript": "^2.0.0",
     "dotenv": "^16.5.0",
@@ -25,6 +26,8 @@
     "@types/cors": "^2.8.17",
     "@types/joi": "^17.2.3",
     "cors": "^2.8.5",
-    "joi": "^17.13.3"
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "twilio": "^5.5.2"
   }
 }
