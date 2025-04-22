@@ -59,6 +59,17 @@ class AuthController {
     }
   }
 
+  async completeGoogleRegistration(req: Request, res: Response): Promise<void> {
+    try {
+      const { email, phoneNumber, age } = req.body;
+      const user = await this.authService.completeAfterGoogleRegister(email, phoneNumber, age);
+      res.status(200).json(user);
+    }
+    catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   async decodeToken(req: Request, res: Response): Promise<void> {
     try {
       const token = req.headers.authorization?.split(' ')[1];

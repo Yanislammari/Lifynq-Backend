@@ -10,6 +10,7 @@ const authRoutes = () => {
   router.post("/verify-otp", authController.verifyOtp.bind(authController));
   router.post("/first-register", authController.firstRegister.bind(authController));
   router.post("/google", authController.authenticateWithGoogle.bind(authController));
+  router.post("/complete-after-google", authController.completeGoogleRegistration.bind(authController)); 
 
   return router;
 }
