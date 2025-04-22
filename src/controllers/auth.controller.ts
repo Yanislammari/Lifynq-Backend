@@ -12,7 +12,7 @@ class AuthController {
 
   async requestOtp(req: Request, res: Response): Promise<void> {
     try {
-      const { phoneNumber } = req.body;
+      const phoneNumber = req.body.phoneNumber;
       await this.authService.requestOtp(phoneNumber);
       res.status(200).json("OTP sent successfully.");
     }
@@ -41,6 +41,17 @@ class AuthController {
 
       const userDto: UserRequestDto = value;
       const token = await this.authService.firstRegister(userDto);
+      res.status(200).json({ token: token });
+    }
+    catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async authenticateWithGoogle(req: Request, res: Response): Promise<void> {
+    try {
+      const idToken = req.body.idToken;
+      const token = await this.authService.authenticateWithGoogle(idToken);
       res.status(200).json({ token: token });
     }
     catch (error: any) {

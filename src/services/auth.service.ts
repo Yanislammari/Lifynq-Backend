@@ -1,3 +1,4 @@
+import { OAuth2Client } from "google-auth-library";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import twilio from "twilio";
@@ -6,23 +7,30 @@ import UserResponseDto from "../models/entities/user/dto/user.response.dto";
 import UserRequestDto from "../models/entities/user/dto/user.request.dto";
 import UserMapper from "../mappers/user.mapper";
 import OTP from "../config/otp";
+import Role from "../models/enums/role";
 
 dotenv.config();
 
 const SECRET_KEY = process.env.SECRET_KEY as string;
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID as string;
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN as string;
+const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER as string;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID as string;
 const OTP_EXPIRATION = 5 * 60 * 1000;
 
 class AuthService {
   private readonly userRepository: UserRepository;
   private readonly userMapper: UserMapper;
-  private readonly twilioService: twilio.Twilio;
   private readonly otpStore: Map<string, OTP>;
+  private readonly twilioService: twilio.Twilio;
+  private readonly googleService: OAuth2Client;
 
   constructor() {
     this.userRepository = new UserRepository();
     this.userMapper = new UserMapper();
-    this.twilioService = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
     this.otpStore = new Map();
+    this.twilioService = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+    this.googleService = new OAuth2Client(GOOGLE_CLIENT_ID);
   }
 
   async requestOtp(phoneNumber: string): Promise<void> {
@@ -37,7 +45,7 @@ class AuthService {
     this.otpStore.set(phoneNumber, otpEntry);
     await this.twilioService.messages.create({
       body: `Your Lyfinq connection code is : ${code}`,
-      from: process.env.TWILIO_PHONE_NUMBER,
+      from: TWILIO_PHONE_NUMBER,
       to: phoneNumber
     });
   }
@@ -90,6 +98,63 @@ class AuthService {
     },
     SECRET_KEY,
     { expiresIn: "1h" });
+  }
+
+  async authenticateWithGoogle(token: string): Promise<string> {
+    const ticket = await this.googleService.verifyIdToken({
+      idToken: token,
+      audience: GOOGLE_CLIENT_ID
+    });
+
+    if (!ticket) {
+      throw new Error("Invalid Google token");
+    }
+
+    const payload = ticket.getPayload();
+    if (!payload) {
+      throw new Error("Invalid payload");
+    }
+
+    let user = await this.userRepository.getByEmail(payload.email!);
+    if (!user) {
+      user = {
+        id: "",
+        email: payload.email!,
+        phoneNumber: "",
+        firstName: payload.given_name!,
+        lastName: payload.family_name!,
+        age: 0,
+        rating: 5,
+        role: Role.User
+      };
+
+      await this.userRepository.add(user);
+    }
+
+    return jwt.sign({
+      id: user!.id,
+      phoneNumber: user!.phoneNumber,
+      role: user!.role
+    },
+    SECRET_KEY,
+    { expiresIn: "1h" });
+  }
+
+  async completeAfterGoogleRegister(email: string, phoneNumber: string, age: number): Promise<UserResponseDto> {
+    const existingUser = await this.userRepository.getByPhoneNumber(phoneNumber);
+    if (existingUser) {
+      throw new Error("User already exists");
+    }
+
+    const user = await this.userRepository.getByEmail(email);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    user.phoneNumber = phoneNumber;
+    user.age = age;
+    const updatedUser = await this.userRepository.put(user.id, user);
+    return this.userMapper.toResponseDTO(updatedUser);
   }
 
   async decodeToken(token: string): Promise<UserResponseDto> {

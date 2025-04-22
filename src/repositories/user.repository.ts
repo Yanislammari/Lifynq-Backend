@@ -12,6 +12,11 @@ class UserRepository extends BaseRepository<User> {
     const user = await this.model.findOne({ phoneNumber });
     return user ? user.toObject() as User : null;
   }
+
+  async getByEmail(email: string): Promise<User | null> {
+    const user = await this.model.findOne({ email });
+    return user ? user.toObject() as User : null;
+  }
 }
 
 export default UserRepository;
