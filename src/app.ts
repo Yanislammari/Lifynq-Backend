@@ -1,6 +1,7 @@
 import express from "express";
 import { jsonMiddleware } from "./config/middlewares";
 import connectDB from "./config/database";
+import authRoutes from "./routes/auth.routes";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -17,5 +18,7 @@ app.use(cors({
 
 jsonMiddleware(app);
 connectDB();
+
+app.use("/auth", authRoutes());
 
 export default app;
