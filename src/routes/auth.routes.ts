@@ -7,6 +7,7 @@ const authRoutes = () => {
   
   router.post("/request-otp", authController.requestOtp.bind(authController));
   router.post("/verify-otp", authController.verifyOtp.bind(authController));
+  router.post("/first-register", authController.firstRegister.bind(authController));
 
   return router;
 }
