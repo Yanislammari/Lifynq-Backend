@@ -95,7 +95,8 @@ class AuthService {
   async decodeToken(token: string): Promise<UserResponseDto> {
     try {
       const decoded = jwt.verify(token, SECRET_KEY) as { id: string };
-      return await this.userRepository.get(decoded.id);
+      const user = await this.userRepository.get(decoded.id);
+      return this.userMapper.toResponseDTO(user);
     }
     catch {
       throw new Error("Invalid token");

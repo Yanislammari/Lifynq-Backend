@@ -47,6 +47,22 @@ class AuthController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async decodeToken(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.headers.authorization?.split(' ')[1];
+      if (!token) {
+        res.status(404).json({ error: "Token not provided" });
+        return;
+      }
+
+      const user = this.authService.decodeToken(token);
+      res.status(200).json(user);
+    }
+    catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 export default AuthController;
